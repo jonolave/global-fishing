@@ -1,4 +1,3 @@
 # Data for a cause: Global fishing visualisation
 
-
-npm start
+https://jonolave.github.io/global-fishing/

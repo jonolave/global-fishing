@@ -7,9 +7,9 @@
     <title>Global fishing</title>
     <style>
         body {
-            background-color: #ffffff;
-            font-size: 12px;
-            color: black;
+            background-color: #e7f0f3;
+            font-size: 16px;
+            color: #1d3a75;
             font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
             -webkit-box-pack: center;
             -webkit-justify-content: center;
@@ -19,8 +19,9 @@
 
         .outer {
             overflow: scroll;
-            width: 1000px;
-            height: 10px;
+            background-color: #e7f0f3;
+            width: 1px;
+            height: 1px;
             margin-top: 0px;
             margin-right: auto;
             margin-left: 0px;
@@ -47,10 +48,15 @@
         .content {
             position: relative;
             margin-right: auto;
-            margin-left: 0px;
+            max-width: 1000px;
             margin: 10px;
+            margin-left: 100px;
+
         }
 
+        h1 {
+            color: #e33a23;
+        }
 
     </style>
     <script src="libraries/p5.min.js"></script>
@@ -63,18 +69,24 @@
     <div class="outer">
         <div class="content_column">
             <div class="content">
-                <h1>Global fishing: the most fishing and fished countries in the world</h1>
-                <p>AND BUT THEREFORE</p>
-                <p>For questions about calculations of values, see below graph.</p>
-                <p>Data from Global Fishing Watch. Data for a cause, february 2019. GDP from...</p>
+                <h1>Fishing in other countries' waters</h1>
+                <strong>Global fishing is big business, and it is common to fish in other countries waters, both legally and illegally. How does the economic wealth of a country relate to its fishing activities?</strong>
+
+                <p>The diagram below explores the relationship between fishing activity in 2016 and a country's GDP per capita for the same year. The diagram includes the 20 countries fishing most in other countries' waters, and the 20 countries with the highest fishing activities from other countries. Hover over a vessel to see details for each country.</p>
+
+                <p>The visualisation is designed by <a href="https://twitter.com/jonolave">Jon Olav Eikenes</a> for the <a href="https://www.olgatsubiks.com/data-for-a-cause"> Data for a Cause Challenge</a> in February 2019. The challenge was to analyse and visualize data from the <a href="https://globalfishingwatch.org/">Global Fishing Watch</a>, which is an organisation that promotes ocean sustainability by tracking and sharing data about global fishing activityes. More information follows below the diagram.</p>
+
+                <p>NB: The visualization is made for desktop browsers, and may not show up on mobile devices. In that case, see <a href="global-fisking.jpg">image</a>.</p>
+
             </div>
             <div class="canvas_container" id="sketchwrapper">
             </div>
             <div class="content">
-                <h1>Global fishing: the most fishing and fished countries in the world</h1>
-                <p>AND BUT THEREFORE</p>
-                <p>For questions about calculations of values, see below graph.</p>
-                <p>Data from Global Fishing Watch. Data for a cause, february 2019. GDP from...</p>
+               
+                <strong>Supplementary information</strong>
+                <p>The dataset does not say anything about how much fish each country has catched. However, the average tonnage of the ships used by a given country, and how many days those ships have been fishing, might give us a rough indication of how much fish they might have catched. In other words, the squares in the diagram provides a indication of the amount of fish that might have been cought. Average tonnage was calculated from all fishing days, not just an average of all the vessels.</p>
+                
+                <p>GDP data is from <a href="https://data.worldbank.org/indicator/ny.gdp.pcap.cd">The World Bank</a>. Numbers from 2016 were used if available, otherwise numbers from the latest year with available data. For The Falkland Islands and Taiwan, I used <a href="https://www.cia.gov/library/publications/the-world-factbook/rankorder/2004rank.html">GDP data from the CIA</a>.</p>
 
             </div>
         </div>

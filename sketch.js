@@ -73,7 +73,7 @@ function setup() {
   gdp_to_verticalScale = d3
     .scaleSqrt()
     .domain([0, 71000])
-    .range([manualHeight - 100, 180]);
+    .range([manualHeight - 10, 180]);
   // scale is reversed to start at bottom. 100 pixels below and above
 
   somethingChanged = false;
@@ -410,17 +410,26 @@ function drawVerticalTicks() {
   text(yAxisText, 0, 0);
   pop();
 
-
-
   for (var i = 0; i < ticks; i++) {
+
+    textAlign(RIGHT);
+    noStroke();
+    fill(0, 160);
+
+    text(
+      (i * verticalScaleTick).toLocaleString(), 
+      xOrigo - 45,
+      gdp_to_verticalScale(i * verticalScaleTick) + 4);
+
     stroke(0, 160);
     noFill();
     line(
-      xOrigo - 15,
+      xOrigo - 35,
       gdp_to_verticalScale(i * verticalScaleTick),
-      xOrigo - 10,
+      xOrigo - 30,
       gdp_to_verticalScale(i * verticalScaleTick)
     );
+
   }
 }
 
