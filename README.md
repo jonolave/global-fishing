@@ -1,2 +1,4 @@
-# global-fishing
-Data for a cause: Global fishing visualisation
+# Data for a cause: Global fishing visualisation
+
+
+npm start
