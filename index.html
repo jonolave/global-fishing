@@ -7,16 +7,10 @@
     <title>Global fishing</title>
     <style>
         body {
-            padding: 0;
-            margin: 0;
             background-color: #ffffff;
             font-size: 12px;
             color: black;
             font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-            /* This centers our sketch horizontally. */
-            display: flex;
-            justify-content: center;
-
             -webkit-box-pack: center;
             -webkit-justify-content: center;
             -ms-flex-pack: center;
@@ -24,6 +18,7 @@
         }
 
         .outer {
+            overflow: scroll;
             width: 1000px;
             height: 10px;
             margin-top: 0px;
@@ -31,14 +26,32 @@
             margin-left: 0px;
         }
 
-        .inner {
+        .content_column {
             position: absolute;
-            width: 1400px;
             left: 0px;
             right: 0px;
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -ms-flexbox;
+            display: flex;
+            width: 1400px;
             margin-right: auto;
             margin-left: auto;
+            -webkit-box-orient: vertical;
+            -webkit-box-direction: normal;
+            -webkit-flex-direction: column;
+            -ms-flex-direction: column;
+            flex-direction: column;
+            }
+
+        .content {
+            position: relative;
+            margin-right: auto;
+            margin-left: 0px;
+            margin: 10px;
         }
+
+
     </style>
     <script src="libraries/p5.min.js"></script>
     <script src="libraries/p5.dom.min.js"></script>
@@ -48,7 +61,22 @@
 
 <body class="body">
     <div class="outer">
-        <div class="inner" id="sketchwrapper">
+        <div class="content_column">
+            <div class="content">
+                <h1>Global fishing: the most fishing and fished countries in the world</h1>
+                <p>AND BUT THEREFORE</p>
+                <p>For questions about calculations of values, see below graph.</p>
+                <p>Data from Global Fishing Watch. Data for a cause, february 2019. GDP from...</p>
+            </div>
+            <div class="canvas_container" id="sketchwrapper">
+            </div>
+            <div class="content">
+                <h1>Global fishing: the most fishing and fished countries in the world</h1>
+                <p>AND BUT THEREFORE</p>
+                <p>For questions about calculations of values, see below graph.</p>
+                <p>Data from Global Fishing Watch. Data for a cause, february 2019. GDP from...</p>
+
+            </div>
         </div>
     </div>
 </body>

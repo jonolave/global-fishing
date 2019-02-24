@@ -18,11 +18,18 @@ var gdp_to_verticalScale;
 var verticalScaleMaxValue;
 var verticalScaleTick;
 
+var color_background;
+var hoverState;
+var hoverCountry;
+var lastHoverCountry;
+var dataLoaded;
+
 function preload() {
-  d3.csv("data/top_countries.csv", function(data) {
+  d3.csv("data/top_countries.csv", function (data) {
     countryList = data;
-    console.log("data loaded");
+    // console.log("data loaded");
     somethingChanged = true;
+    dataLoaded = true;
   });
 }
 
@@ -30,11 +37,16 @@ function setup() {
   manualHeight = 3000;
   manualWidth = 1400;
 
+  dataLoaded = false;
+  hoverState = false;
+
   horizontalScaleMaxValue = 320800;
   horizontalScaleTick = 50000; // value between each tick
 
   verticalScaleMaxValue = 71000;
   verticalScaleTick = 5000;
+
+  color_background = color(231, 240, 243);
 
   var canvas = createCanvas(manualWidth, manualHeight);
   canvas.parent('sketchwrapper');
@@ -61,19 +73,21 @@ function setup() {
   gdp_to_verticalScale = d3
     .scaleSqrt()
     .domain([0, 71000])
-    .range([manualHeight - 100, 150]);
+    .range([manualHeight - 100, 180]);
   // scale is reversed to start at bottom. 100 pixels below and above
 
   somethingChanged = false;
 }
 
 function draw() {
+
   if (somethingChanged) {
-    background(231, 240, 243);
+    background(color_background);
 
     drawHorizontalTicks();
-    drawVerticalTicks(); 
+    drawVerticalTicks();
 
+    // Draw all countries
     for (var i = 0; i < countryList.length; i++) {
       // Do something
       drawVessel(
@@ -89,36 +103,347 @@ function draw() {
       );
     }
 
+    // Draw legend on Norway if not hoverstate for Norway
+    if (hoverState && hoverCountry === "NOR") {} else {
+      drawlegend(
+        days_to_horizontal_Scale(countryList[0].fishing_days_2016), // xpos based on days
+        gdp_to_verticalScale(countryList[0].gdp), // ypos
+        tonnageScale(countryList[0].avg_tonnage), // vesselLength
+        cargoHeightScale(countryList[0].fishing_days_2016), // cargoheight
+        tonnageScale(countryList[0].fished_avg_tonnage), // fishedLength
+        cargoHeightScale(countryList[0].fished_days_2016), // fishedHeight
+        days_to_horizontal_Scale(countryList[0].fishing_days_2012)
+      );
+    }
+
+    // Draw country info
+    if (hoverState) {
+      var countryToShow = getArrayPosition(hoverCountry);
+
+      drawCountryInfo(
+        countryList[countryToShow].country_name, //countryName
+        days_to_horizontal_Scale(countryList[countryToShow].fishing_days_2016), // xpos based on days
+        gdp_to_verticalScale(countryList[countryToShow].gdp), // ypos
+        countryList[countryToShow].avg_tonnage, // vesselLength tonnage
+        countryList[countryToShow].fishing_days_2016, // cargoheight
+        countryList[countryToShow].fished_avg_tonnage, // fishedLength
+        countryList[countryToShow].fished_days_2016, // fishedHeight
+        days_to_horizontal_Scale(countryList[countryToShow].fishing_days_2012)
+      );
+
+    }
     somethingChanged = false;
   }
 }
 
+function mouseMoved() {
+  var xThreshold = 50; // pixels from vessel center
+  var yThreshold = 50; // pixels from vessel center
+  var xDiff;
+  var yDiff;
+
+  if (dataLoaded) {
+
+    for (var i = 0; i < countryList.length; i++) {
+      xDiff = Math.abs(mouseX - days_to_horizontal_Scale(countryList[i].fishing_days_2016));
+      yDiff = Math.abs(mouseY - gdp_to_verticalScale(countryList[i].gdp));
+
+      // check ypos first, then x
+      if (yDiff < yThreshold) {
+        if (xDiff < xThreshold) {
+          // We have a hover
+          // Is this a new state?
+          if (hoverState && lastHoverCountry == hoverCountry) {
+            // no
+            somethingChanged = false;
+          } else {
+            // yes, new state
+            somethingChanged = true;
+            lastHoverCountry = hoverCountry;
+          }
+          // we have hover 
+          hoverState = true;
+          hoverCountry = countryList[i].country;
+          break;
+        }
+      }
+      // if last item and we had hoverstate, but not anymore
+      if (hoverState && i === countryList.length - 1) {
+        hoverState = false;
+        somethingChanged = true;
+      }
+    }
+  }
+}
+
+function drawCountryInfo(
+  countryName,
+  xpos,
+  ypos,
+  fishing_tonnage,
+  fishing_days,
+  fished_tonnage,
+  fished_days,
+  fishing_2012) {
+
+  var fishing_tonnage_px = tonnageScale(fishing_tonnage);
+  var fished_tonnage_px = tonnageScale(fished_tonnage);
+  var fishing_days_px = cargoHeightScale(fishing_days);
+  var fished_days_px = cargoHeightScale(fished_days);
+
+  var color_red = color(231, 67, 39);
+  var color_blue = color(32, 66, 128);
+
+  var maxTonnage = Math.max(fishing_tonnage_px, fished_tonnage_px);
+
+  // if pixel values are too low, adjust
+  if (fishing_days_px < 20) {
+    fishing_days_px = 20;
+  }
+  if (fished_days_px < 35) {
+    // fished_days_px = 35;
+  }
+
+
+  // Calculate 2012-2016 pixel difference
+  var diff_2012_2016 = Math.abs(xpos - fishing_2012);
+
+  push();
+  translate(xpos, ypos);
+
+  // draw background sheets
+  // fill(red(color_background), green(color_background), blue(color_background), 120);
+  fill(250, 200);
+  noStroke();
+  // tonnes fishing
+  rect(fishing_tonnage_px / 2 - 90, -fishing_days_px - 70, 90, 45, 3);
+  // days fishing
+  rect((maxTonnage / 2) + 2, -56, 90, 42, 3);
+  // days fished
+  rect((maxTonnage / 2) + 2, 7, 90, 42, 3);
+  // tonnes fished
+  rect(fished_tonnage_px / 2 - 90, fished_days_px + 7, 90, 45, 3);
+
+  textSize(12);
+  textAlign(LEFT);
+  noStroke();
+
+  fill(color_red);
+
+  // Fishing tonnage
+  textStyle(BOLD);
+  textAlign(RIGHT);
+  textSize(16);
+  text(Math.round(fishing_tonnage).toLocaleString(), fishing_tonnage_px / 2 - 5, -fishing_days_px - 25 - 24);
+  textSize(12);
+  textStyle(NORMAL);
+  5
+  text("tonnes (avg.)", fishing_tonnage_px / 2 - 4, -fishing_days_px - 9 - 24);
+
+  // Fishing days
+  textStyle(BOLD);
+  textAlign(LEFT);
+  textSize(16);
+  text(Math.round(fishing_days).toLocaleString(), (maxTonnage / 2) + 6, -36);
+  textStyle(NORMAL);
+  textSize(12);
+  text("days fishing", (maxTonnage / 2) + 6, -20);
+
+  fill(color_blue);
+
+  // Fished days
+  textStyle(BOLD);
+  textSize(16);
+  text(Math.round(fished_days).toLocaleString(), (maxTonnage / 2) + 6, 25);
+  textStyle(NORMAL);
+  textSize(12);
+  text("days fished", (maxTonnage / 2) + 6, 42);
+
+  // Fished tonnage
+  textStyle(BOLD);
+  textAlign(RIGHT);
+  textSize(16);
+  text(Math.round(fished_tonnage).toLocaleString(), fished_tonnage_px / 2 - 4, fished_days_px + 3 + 25);
+  textSize(12);
+  textStyle(NORMAL);
+  text(" tonnes (avg.)", fished_tonnage_px / 2 - 4, fished_days_px + 3 + 25 + 16);
+
+  // Fishing 2012
+  // text("hello", -diff_2012_2016, 30, fishing_2012);
+
+  pop();
+}
+
+function drawlegend(xpos, ypos, fishing_tonnage, fishing_days, fished_tonnage, fished_days, fishing_2012) {
+  var legend_text_fishing_tonnage = ["Average vessel tonnage", "(fishing in other countries)"];
+  var legend_text_fishing_days = ["Days fishing in other", "countries’ waters in 2016"];
+  var legend_text_fished_tonnage = ["Average vessel tonnage", "(fished by other countries)"];
+  var legend_text_fished_days = ["Days fished by vessels", "from other countries in 2016"];
+  var legend_text_change = ["Change in days", "fishing in other", "countries’ waters", "from 2012 to 2016"];
+
+  var color_red = color(231, 67, 39);
+  var color_blue = color(32, 66, 128);
+
+  // Calculate 2012-2016 pixel difference
+  var diff_2012_2016 = Math.abs(xpos - fishing_2012);
+
+  push();
+  translate(xpos, ypos);
+
+  // Fishing tonnage
+  drawArrow(-(fishing_tonnage / 2), -fishing_days - 9 - 24, fishing_tonnage / 2, -fishing_days - 9 - 24, color_red, true, true);
+  drawText(-(fishing_tonnage / 2), -fishing_days - 9 - 24 - 28, legend_text_fishing_tonnage, color_red);
+
+  // Fishing days
+  drawArrow(60, -fishing_days - 9, 60, -9, color_red, true, true);
+  drawText(70, -fishing_days + 10, legend_text_fishing_days, color_red);
+
+  // Fished days
+  drawArrow(60, 2, 60, fished_days + 2, color_blue, true, true);
+  drawText(70, 30, legend_text_fished_days, color_blue);
+
+  // Fished tonnage
+  drawArrow(-(fished_tonnage / 2), fished_days + 3 + 10, fished_tonnage / 2, fished_days + 3 + 10, color_blue, true, true);
+  drawText(-(fished_tonnage / 2), fished_days + 3 + 30, legend_text_fished_tonnage, color_blue);
+
+  // Fishing 2012
+  drawArrow(-diff_2012_2016, 10, 0, 10, color_red, false, true);
+  drawText(-diff_2012_2016, 30, legend_text_change, color_red);
+
+  pop();
+}
+
+function drawText(xpos, ypos, textAsList, textColor) {
+  var textlineHeight = 15;
+  textSize(12);
+  textAlign(LEFT);
+  noStroke();
+  textStyle(NORMAL);
+  fill(textColor);
+  for (var textLine in textAsList) {
+    text(textAsList[textLine], xpos, ypos + (textlineHeight * textLine));
+  }
+}
+
+function drawArrow(startX, startY, endX, endY, strokeColor, startArrow, endArrow) {
+  // strokeColor: send color, startArrow and endArrow: true or false
+  noFill();
+  stroke(strokeColor);
+
+  // Draw line
+
+  beginShape();
+  vertex(startX, startY);
+  vertex(endX, endY);
+  endShape();
+
+  var arrowWidth = 3;
+  var arrowLength = 4;
+  var angleRadians = Math.atan2(endY - startY, endX - startX);
+
+  if (startArrow) {
+    push();
+    translate(startX, startY);
+    rotate(angleRadians);
+    beginShape();
+    vertex(arrowLength, arrowWidth);
+    vertex(0, 0);
+    vertex(arrowLength, -arrowWidth);
+    endShape();
+    // endShape(CLOSE); // to fill arrow
+    pop();
+  }
+
+  if (endArrow) {
+    push();
+    translate(endX, endY);
+    rotate(angleRadians);
+    beginShape();
+    vertex(-arrowLength, -arrowWidth);
+    vertex(0, 0);
+    vertex(-arrowLength, arrowWidth);
+    endShape();
+    pop();
+  }
+
+}
+
+
+// Function to find index of array
+function getArrayPosition(countryCode) {
+  arrayPosition = countryList.findIndex(function (countryList) {
+    return countryList.country === countryCode;
+  });
+  return arrayPosition;
+}
+
 function drawVerticalTicks() {
+  var xOrigo = days_to_horizontal_Scale(0);
+  var yAxisText = "GDP per capita (USD, 2016)";
+
   // calculate number of ticks
   var ticks = Math.ceil(verticalScaleMaxValue / verticalScaleTick) + 1;
+
+  // AXIS text
+  textAlign(LEFT);
+  textSize(12);
+  // text(yAxisText[0], 10, 54);
+  // text(yAxisText[1], 10, 54 + 16);
+
+  // vertical line
+  stroke(0, 40);
+  noFill();
+  line(xOrigo, 50, xOrigo, gdp_to_verticalScale(0));
+
+  // Draw vertical text
+  push();
+  // background box
+  translate(xOrigo + 4, 80);
+  rotate(-PI / 2);
+  fill(color_background);
+  // Text
+  noStroke();
+  rect(-textWidth(yAxisText) - 10, -10, textWidth(yAxisText) + 20, 20);
+  noStroke();
+  fill(0, 160);
+  textAlign(RIGHT);
+  text(yAxisText, 0, 0);
+  pop();
+
+
 
   for (var i = 0; i < ticks; i++) {
     stroke(0, 160);
     noFill();
     line(
-      10,
+      xOrigo - 15,
       gdp_to_verticalScale(i * verticalScaleTick),
-      15,
+      xOrigo - 10,
       gdp_to_verticalScale(i * verticalScaleTick)
     );
   }
 }
 
 function drawHorizontalTicks() {
-  textSize(10);
   textStyle(NORMAL);
   var ticks = Math.ceil(horizontalScaleMaxValue / horizontalScaleTick) + 1;
+  var xAxisText = "Days of fishing in other contries' waters";
 
   // AXIS text
   textAlign(LEFT);
   noStroke();
   fill(0, 160);
-  text("Days of fishing:", days_to_horizontal_Scale(0), 20);
+  textSize(12);
+  text(xAxisText, days_to_horizontal_Scale(0) + 40, 54);
+  var textLength = textWidth(xAxisText);
+
+  stroke(0, 40);
+  noFill();
+  line(days_to_horizontal_Scale(0) - 1, 50, days_to_horizontal_Scale(0) + 30, 50);
+  line(days_to_horizontal_Scale(0) + 40 + textLength + 10, 50, days_to_horizontal_Scale((ticks - 1) * horizontalScaleTick), 50);
+
+  textSize(10);
+  var textLength;
 
   for (var i = 0; i < ticks; i++) {
     textAlign(CENTER);
@@ -135,9 +460,9 @@ function drawHorizontalTicks() {
     noFill();
     line(
       days_to_horizontal_Scale(i * horizontalScaleTick),
-      50,
+      48,
       days_to_horizontal_Scale(i * horizontalScaleTick),
-      55
+      53
     );
   }
 }
@@ -156,13 +481,14 @@ function drawVessel(
   // Define colors
   var color_hull = color(90, 109, 112, 126);
   var color_house = color(147, 163, 163, 126);
-  var color_windows = color(0, 20);
+  var color_windows = color(0, 80);
   var color_roof = color(90, 109, 112, 126);
   var color_fished_area = color(32, 66, 128, 110);
   var color_cargo = color(231, 67, 39, 110);
   var color_shadow = color(0, 20);
   var color_ocean_overlay = color(231, 240, 243, 230);
-  var color_oceanline = color(101, 98, 79, 80);
+  // var color_oceanline = color(101, 98, 79, 80);
+  var color_oceanline = color(231, 67, 39, 110);
   var color_12_16_diff = color(101, 98, 79, 160);
 
 
@@ -293,9 +619,9 @@ function drawVessel(
 
   // horizontal ocean line
   // From bow to aft in 2012
-//   line(18 - length, 59, 83 + length + diff_2012_2016, 59);
+  //   line(18 - length, 59, 83 + length + diff_2012_2016, 59);
 
-  stroke(color_12_16_diff);
+  // stroke(color_12_16_diff);
 
   // vessel origo vertical line
   line(50, 56, 50, 62);
@@ -305,8 +631,8 @@ function drawVessel(
   line(50 + diff_2012_2016, 56, 50 + diff_2012_2016, 62);
   // line(83 + length + diff_2012_2016, 56, 83 + length + diff_2012_2016, 62);
 
-// 2012-2016 horizontal line
-line(50, 59, 50 + diff_2012_2016, 59);
+  // 2012-2016 horizontal line
+  line(50, 59, 50 + diff_2012_2016, 59);
 
 
   pop(); // Restore original state
