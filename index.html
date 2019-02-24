@@ -13,6 +13,31 @@
             font-size: 12px;
             color: black;
             font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            /* This centers our sketch horizontally. */
+            display: flex;
+            justify-content: center;
+
+            -webkit-box-pack: center;
+            -webkit-justify-content: center;
+            -ms-flex-pack: center;
+            justify-content: center;
+        }
+
+        .outer {
+            width: 1000px;
+            height: 10px;
+            margin-top: 0px;
+            margin-right: auto;
+            margin-left: 0px;
+        }
+
+        .inner {
+            position: absolute;
+            width: 1400px;
+            left: 0px;
+            right: 0px;
+            margin-right: auto;
+            margin-left: auto;
         }
     </style>
     <script src="libraries/p5.min.js"></script>
@@ -21,7 +46,11 @@
     <script src="sketch.js"></script>
 </head>
 
-<body>
+<body class="body">
+    <div class="outer">
+        <div class="inner" id="sketchwrapper">
+        </div>
+    </div>
 </body>
 
 </html>

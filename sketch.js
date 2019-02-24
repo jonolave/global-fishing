@@ -28,7 +28,7 @@ function preload() {
 
 function setup() {
   manualHeight = 3000;
-  manualWidth = 1500;
+  manualWidth = 1400;
 
   horizontalScaleMaxValue = 320800;
   horizontalScaleTick = 50000; // value between each tick
@@ -36,7 +36,8 @@ function setup() {
   verticalScaleMaxValue = 71000;
   verticalScaleTick = 5000;
 
-  canvas = createCanvas(manualWidth, manualHeight);
+  var canvas = createCanvas(manualWidth, manualHeight);
+  canvas.parent('sketchwrapper');
 
   // Define scales
   // cargoHeight
@@ -153,15 +154,17 @@ function drawVessel(
   xpos_2012
 ) {
   // Define colors
-  color_hull = color(90, 109, 112, 126);
-  color_house = color(147, 163, 163, 126);
-  color_windows = color(0, 20);
-  color_roof = color(90, 109, 112, 126);
-  color_fished_area = color(32, 66, 128, 110);
-  color_cargo = color(231, 67, 39, 110);
-  color_shadow = color(0, 20);
-  color_ocean_overlay = color(231, 240, 243, 230);
-  color_oceanline = color(101, 98, 79, 126);
+  var color_hull = color(90, 109, 112, 126);
+  var color_house = color(147, 163, 163, 126);
+  var color_windows = color(0, 20);
+  var color_roof = color(90, 109, 112, 126);
+  var color_fished_area = color(32, 66, 128, 110);
+  var color_cargo = color(231, 67, 39, 110);
+  var color_shadow = color(0, 20);
+  var color_ocean_overlay = color(231, 240, 243, 230);
+  var color_oceanline = color(101, 98, 79, 80);
+  var color_12_16_diff = color(101, 98, 79, 160);
+
 
   // Calculate 2012-2016 pixel difference
   var diff_2012_2016 = Math.abs(xpos - xpos_2012);
@@ -285,14 +288,26 @@ function drawVessel(
   // line(28.5-length,14,28.5-length,47);
   // line(80.5+length,9,80.5+length,51);
 
-  // ocean
+  // Ccean line 2012-2016
   stroke(color_oceanline);
-  // horizontal line
-  line(18 - length, 59, 83 + length + diff_2012_2016, 59);
-  // propeller vertical line
-  line(83 + length, 56, 83 + length, 62);
+
+  // horizontal ocean line
+  // From bow to aft in 2012
+//   line(18 - length, 59, 83 + length + diff_2012_2016, 59);
+
+  stroke(color_12_16_diff);
+
+  // vessel origo vertical line
+  line(50, 56, 50, 62);
+  // line(83 + length, 56, 83 + length, 62);
+
   // 2012 vertical line
-  line(83 + length + diff_2012_2016, 56, 83 + length + diff_2012_2016, 62);
+  line(50 + diff_2012_2016, 56, 50 + diff_2012_2016, 62);
+  // line(83 + length + diff_2012_2016, 56, 83 + length + diff_2012_2016, 62);
+
+// 2012-2016 horizontal line
+line(50, 59, 50 + diff_2012_2016, 59);
+
 
   pop(); // Restore original state
 
