@@ -67,7 +67,7 @@ function setup() {
   days_to_horizontal_Scale = d3
     .scaleSqrt()
     .domain([0, 320800])
-    .range([100, manualWidth - 100]);
+    .range([100, manualWidth - 120]);
 
   // vertical gdp scale
   gdp_to_verticalScale = d3
@@ -204,69 +204,86 @@ function drawCountryInfo(
     // fished_days_px = 35;
   }
 
-
   // Calculate 2012-2016 pixel difference
   var diff_2012_2016 = Math.abs(xpos - fishing_2012);
 
   push();
+  // translate 0,0 to vessel center position
   translate(xpos, ypos);
 
-  // draw background sheets
-  // fill(red(color_background), green(color_background), blue(color_background), 120);
-  fill(250, 200);
-  noStroke();
-  // tonnes fishing
-  rect(fishing_tonnage_px / 2 - 90, -fishing_days_px - 70, 90, 45, 3);
-  // days fishing
-  rect((maxTonnage / 2) + 2, -56, 90, 42, 3);
-  // days fished
-  rect((maxTonnage / 2) + 2, 7, 90, 42, 3);
-  // tonnes fished
-  rect(fished_tonnage_px / 2 - 90, fished_days_px + 7, 90, 45, 3);
+  // BACKGROUND SHEETS
 
-  textSize(12);
-  textAlign(LEFT);
+  // fill(red(color_background), green(color_background), blue(color_background), 120);
+  fill(250, 220);
+  noStroke();
+
+  // Sheet above cargo: fishing
+  beginShape();
+  vertex(0, -fishing_days_px - 27);
+  vertex(5, -fishing_days_px - 32);
+  vertex(45, -fishing_days_px - 32);
+  vertex(45, -fishing_days_px - 72);
+  vertex(-45, -fishing_days_px - 72);
+  vertex(-45, -fishing_days_px - 32);
+  vertex(-5, -fishing_days_px - 32);
+  endShape(CLOSE);
+
+  // Sheet below vessel: fished
+  beginShape();
+  vertex(0, fished_days_px + 7);
+  vertex(5, fished_days_px + 12);
+  vertex(45, fished_days_px + 12);
+  vertex(45, fished_days_px + 52);
+  vertex(-45, fished_days_px + 52);
+  vertex(-45, fished_days_px + 12);
+  vertex(-5, fished_days_px + 12);
+  endShape(CLOSE);
+
+  // Upper right: days fishing
+  rect((maxTonnage / 2) + 25, -49, 90, 40);
+
+  // Lower right: days fished
+  rect((maxTonnage / 2) + 25, 3, 90, 40);
+
+  // TEXT ON SHEETS
+  textAlign(CENTER);
   noStroke();
 
   fill(color_red);
 
-  // Fishing tonnage
+  // Fishing tonnage above vessel
   textStyle(BOLD);
-  textAlign(RIGHT);
   textSize(16);
-  text(Math.round(fishing_tonnage).toLocaleString(), fishing_tonnage_px / 2 - 5, -fishing_days_px - 25 - 24);
+  text(Math.round(fishing_tonnage).toLocaleString(), 0, -fishing_days_px - 52);
   textSize(12);
   textStyle(NORMAL);
-  5
-  text("tonnes (avg.)", fishing_tonnage_px / 2 - 4, -fishing_days_px - 9 - 24);
+  text("tonnes (avg.)", 0, -fishing_days_px - 40);
 
-  // Fishing days
+  // Upper right: Fishing days
   textStyle(BOLD);
-  textAlign(LEFT);
   textSize(16);
-  text(Math.round(fishing_days).toLocaleString(), (maxTonnage / 2) + 6, -36);
+  text(Math.round(fishing_days).toLocaleString(), (maxTonnage / 2) + 70, -29);
   textStyle(NORMAL);
   textSize(12);
-  text("days fishing", (maxTonnage / 2) + 6, -20);
+  text("days fishing", (maxTonnage / 2) + 70, -17);
 
   fill(color_blue);
 
-  // Fished days
+  // Fished tonnage below vessel
   textStyle(BOLD);
   textSize(16);
-  text(Math.round(fished_days).toLocaleString(), (maxTonnage / 2) + 6, 25);
-  textStyle(NORMAL);
+  text(Math.round(fished_tonnage).toLocaleString(), 0, fished_days_px + 32);
   textSize(12);
-  text("days fished", (maxTonnage / 2) + 6, 42);
+  textStyle(NORMAL);
+  text(" tonnes (avg.)", 0, fished_days_px + 3 + 25 + 16);
 
-  // Fished tonnage
+  // Lower right: Fished days
   textStyle(BOLD);
-  textAlign(RIGHT);
   textSize(16);
-  text(Math.round(fished_tonnage).toLocaleString(), fished_tonnage_px / 2 - 4, fished_days_px + 3 + 25);
-  textSize(12);
+  text(Math.round(fished_days).toLocaleString(), (maxTonnage / 2) + 70, 23);
   textStyle(NORMAL);
-  text(" tonnes (avg.)", fished_tonnage_px / 2 - 4, fished_days_px + 3 + 25 + 16);
+  textSize(12);
+  text("days fished", (maxTonnage / 2) + 70, 35);
 
   // Fishing 2012
   // text("hello", -diff_2012_2016, 30, fishing_2012);
@@ -417,7 +434,7 @@ function drawVerticalTicks() {
     fill(0, 160);
 
     text(
-      (i * verticalScaleTick).toLocaleString(), 
+      (i * verticalScaleTick).toLocaleString(),
       xOrigo - 45,
       gdp_to_verticalScale(i * verticalScaleTick) + 4);
 
@@ -488,12 +505,12 @@ function drawVessel(
   xpos_2012
 ) {
   // Define colors
-  var color_hull = color(90, 109, 112, 126);
+  var color_hull = color(90, 109, 112, 150);
   var color_house = color(147, 163, 163, 126);
   var color_windows = color(0, 80);
   var color_roof = color(90, 109, 112, 126);
-  var color_fished_area = color(32, 66, 128, 110);
-  var color_cargo = color(231, 67, 39, 110);
+  var color_fished_area = color(32, 66, 128, 150);
+  var color_cargo = color(231, 67, 39, 150);
   var color_shadow = color(0, 20);
   var color_ocean_overlay = color(231, 240, 243, 230);
   // var color_oceanline = color(101, 98, 79, 80);
@@ -608,41 +625,20 @@ function drawVessel(
   vertex(18 - length, 59); // på linja
   vertex(16.19 - length, 55.16);
   endShape(CLOSE);
-
-  //ocean
-  //   fill(color_ocean_overlay);
-  //   beginShape();
-  //   vertex(80.5 + length, 66.78);
-  //   vertex(21.98 - length, 66.78);
-  //   vertex(15.84 - length, 58.54);
-  //   vertex(86.96 + length, 58.54);
-  //   endShape(CLOSE);
-
-  // masts
-  // stroke(101, 98, 79);
-  // line(28.5-length,14,28.5-length,47);
-  // line(80.5+length,9,80.5+length,51);
-
+ 
   // Ccean line 2012-2016
   stroke(color_oceanline);
-
-  // horizontal ocean line
-  // From bow to aft in 2012
-  //   line(18 - length, 59, 83 + length + diff_2012_2016, 59);
-
-  // stroke(color_12_16_diff);
 
   // vessel origo vertical line
   line(50, 56, 50, 62);
   // line(83 + length, 56, 83 + length, 62);
 
   // 2012 vertical line
-  line(50 + diff_2012_2016, 56, 50 + diff_2012_2016, 62);
+  line(49 + diff_2012_2016, 56, 49 + diff_2012_2016, 62);
   // line(83 + length + diff_2012_2016, 56, 83 + length + diff_2012_2016, 62);
 
   // 2012-2016 horizontal line
-  line(50, 59, 50 + diff_2012_2016, 59);
-
+  line(50, 59, 49 + diff_2012_2016, 59);
 
   pop(); // Restore original state
 
