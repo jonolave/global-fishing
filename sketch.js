@@ -1,7 +1,7 @@
 var canvas;
+var canvasScale;
 var countryList;
 var somethingChanged;
-var temp;
 
 var manualHeight;
 
@@ -34,6 +34,9 @@ function preload() {
 }
 
 function setup() {
+  // canvas was too large to shop up on mobile devices
+  canvasScale = 0.9;
+
   manualHeight = 3000;
   manualWidth = 1400;
 
@@ -48,7 +51,7 @@ function setup() {
 
   color_background = color(231, 240, 243);
 
-  var canvas = createCanvas(manualWidth, manualHeight);
+  var canvas = createCanvas(manualWidth*canvasScale, manualHeight*canvasScale);
   canvas.parent('sketchwrapper');
 
   // Define scales
@@ -80,8 +83,10 @@ function setup() {
 }
 
 function draw() {
-
   if (somethingChanged) {
+    push(); // Start a new drawing state
+    scale(canvasScale);
+
     background(color_background);
 
     drawHorizontalTicks();
@@ -133,7 +138,13 @@ function draw() {
 
     }
     somethingChanged = false;
+    pop(); // Restore original state
   }
+}
+
+function mouseReleased(){
+  // In order for touch to be registered on mobile devices
+  mouseMoved();
 }
 
 function mouseMoved() {
@@ -143,10 +154,9 @@ function mouseMoved() {
   var yDiff;
 
   if (dataLoaded) {
-
     for (var i = 0; i < countryList.length; i++) {
-      xDiff = Math.abs(mouseX - days_to_horizontal_Scale(countryList[i].fishing_days_2016));
-      yDiff = Math.abs(mouseY - gdp_to_verticalScale(countryList[i].gdp));
+      xDiff = Math.abs(mouseX - canvasScale*days_to_horizontal_Scale(countryList[i].fishing_days_2016));
+      yDiff = Math.abs(mouseY - canvasScale*gdp_to_verticalScale(countryList[i].gdp));
 
       // check ypos first, then x
       if (yDiff < yThreshold) {
