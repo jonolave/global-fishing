@@ -2,4 +2,4 @@
 
 https://jonolave.github.io/global-fishing/
 
-![Global fishing visualisation](global-fishing.jpg)
+![Global fishing visualisation](global-fishing.png)
