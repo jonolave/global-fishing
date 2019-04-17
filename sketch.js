@@ -76,7 +76,7 @@ function setup() {
   gdp_to_verticalScale = d3
     .scaleSqrt()
     .domain([0, 71000])
-    .range([manualHeight - 10, 180]);
+    .range([manualHeight - 20, 180]);
   // scale is reversed to start at bottom. 100 pixels below and above
 
   somethingChanged = false;
@@ -89,7 +89,8 @@ function draw() {
 
     background(color_background);
 
-    drawHorizontalTicks();
+    drawHorizontalTicks(50,-10);
+    drawHorizontalTicks(gdp_to_verticalScale(0),15);
     drawVerticalTicks();
 
     // Draw all countries
@@ -460,25 +461,27 @@ function drawVerticalTicks() {
   }
 }
 
-function drawHorizontalTicks() {
+function drawHorizontalTicks(axisYpos,axisTextOffset) {
   textStyle(NORMAL);
   var ticks = Math.ceil(horizontalScaleMaxValue / horizontalScaleTick) + 1;
   var xAxisText = "Days of fishing in other contries' waters";
+  var ypos = axisYpos; // 50
+  var yposText = axisTextOffset; // -10 
 
   // AXIS text
   textAlign(LEFT);
   noStroke();
   fill(0, 160);
   textSize(12);
-  text(xAxisText, days_to_horizontal_Scale(0) + 40, 54);
+  text(xAxisText, days_to_horizontal_Scale(0) + 40, ypos + 4);
   var textLength = textWidth(xAxisText);
 
   stroke(0, 40);
   noFill();
-  line(days_to_horizontal_Scale(0) - 1, 50, days_to_horizontal_Scale(0) + 30, 50);
-  line(days_to_horizontal_Scale(0) + 40 + textLength + 10, 50, days_to_horizontal_Scale((ticks - 1) * horizontalScaleTick), 50);
+  line(days_to_horizontal_Scale(0) - 1, ypos, days_to_horizontal_Scale(0) + 30, ypos);
+  line(days_to_horizontal_Scale(0) + 40 + textLength + 10, ypos, days_to_horizontal_Scale((ticks - 1) * horizontalScaleTick), ypos);
 
-  textSize(10);
+  textSize(12);
   var textLength;
 
   for (var i = 0; i < ticks; i++) {
@@ -489,16 +492,16 @@ function drawHorizontalTicks() {
     text(
       (i * horizontalScaleTick).toLocaleString(),
       days_to_horizontal_Scale(i * horizontalScaleTick),
-      40
+      ypos+yposText
     );
 
     stroke(0, 160);
     noFill();
     line(
       days_to_horizontal_Scale(i * horizontalScaleTick),
-      48,
+      ypos-2,
       days_to_horizontal_Scale(i * horizontalScaleTick),
-      53
+      ypos+3
     );
   }
 }
