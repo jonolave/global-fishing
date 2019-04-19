@@ -90,7 +90,7 @@ function draw() {
     background(color_background);
 
     drawHorizontalTicks(50,-10);
-    drawHorizontalTicks(gdp_to_verticalScale(0),15);
+    drawHorizontalTicks(gdp_to_verticalScale(0),16);
     drawVerticalTicks();
 
     // Draw all countries
